@@ -65,12 +65,19 @@ def check_dependencies():
         print("  - ffmpeg is installed.")
 
     # Check for deno (required by yt-dlp to bypass some YouTube restrictions)
-    print("  - Checking for Deno (required for some YouTube tracks)...")
-    try:
-        subprocess.check_call([sys.executable, "-m", "spotdl", "--download-deno"])
-        print("  - Deno is ready.")
-    except subprocess.CalledProcessError:
-        print("  [!] Failed to download Deno. Some tracks might fail to download.")
+    deno_path_win = os.path.expanduser("~/.spotdl/deno.exe")
+    deno_path_unix = os.path.expanduser("~/.spotdl/deno")
+    if os.path.exists(deno_path_win) or os.path.exists(deno_path_unix) or shutil.which("deno"):
+        print("  - Deno is already installed.")
+    else:
+        print("  - Checking for Deno (required for some YouTube tracks)...")
+        try:
+            # Use Popen to auto-answer 'n' if it happens to prompt
+            p = subprocess.Popen([sys.executable, "-m", "spotdl", "--download-deno"], stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+            p.communicate(input='n\n')
+            print("  - Deno is ready.")
+        except Exception:
+            print("  [!] Failed to download Deno. Some tracks might fail to download.")
 
 def setup_directories():
     """Create download directories if they don't exist."""
