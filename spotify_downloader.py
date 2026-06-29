@@ -91,31 +91,30 @@ def setup_directories():
         os.makedirs(DOWNLOAD_DIR)
     if not os.path.exists(f"{DOWNLOAD_DIR}/Songs"):
         os.makedirs(f"{DOWNLOAD_DIR}/Songs")
-    if not os.path.exists(f"{DOWNLOAD_DIR}/Playlists"):
-        os.makedirs(f"{DOWNLOAD_DIR}/Playlists")
 
 def download_single_url(url):
     """Download a single Spotify URL."""
     setup_directories()
     print(f"\n[*] Processing URL: {url}")
     try:
+        # Run spotdl from inside the DOWNLOAD_DIR so relative paths in M3U are correct
         cmd = [
             sys.executable, "-m", "spotdl", "download", url,
-            "--output", f"{DOWNLOAD_DIR}/Songs/{{artists}} - {{title}}.{{ext}}",
-            "--m3u", f"{DOWNLOAD_DIR}/Playlists/{{list}}.m3u",
+            "--output", "Songs/{artists} - {title}",
+            "--m3u", "{list}.m3u",
             "--overwrite", "skip"
         ]
         
         if url.strip().lower() == "saved":
              cmd = [
                 sys.executable, "-m", "spotdl", "saved",
-                "--output", f"{DOWNLOAD_DIR}/Songs/{{artists}} - {{title}}.{{ext}}",
-                "--m3u", f"{DOWNLOAD_DIR}/Playlists/Liked Songs.m3u",
+                "--output", "Songs/{artists} - {title}",
+                "--m3u", "Liked Songs.m3u",
                 "--overwrite", "skip"
              ]
              print("    Note: Downloading 'saved' songs requires you to log in to Spotify.")
 
-        subprocess.check_call(cmd)
+        subprocess.check_call(cmd, cwd=DOWNLOAD_DIR)
         print(f"[*] Successfully finished processing: {url}")
         return True, f"Successfully downloaded: {url}"
         
