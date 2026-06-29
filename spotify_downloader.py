@@ -49,20 +49,26 @@ def check_dependencies():
         print("  - spotdl installed successfully.")
 
     # Check for ffmpeg (required by spotdl to process audio files)
-    if shutil.which("ffmpeg") is None:
-        print("  - ffmpeg not found on system PATH.")
+    ffmpeg_path_win = os.path.expanduser("~/.spotdl/ffmpeg.exe")
+    ffmpeg_path_unix = os.path.expanduser("~/.spotdl/ffmpeg")
+    
+    if shutil.which("ffmpeg") is not None:
+        print("  - ffmpeg is installed on system PATH.")
+    elif os.path.exists(ffmpeg_path_win) or os.path.exists(ffmpeg_path_unix):
+        print("  - ffmpeg is installed locally for spotdl.")
+    else:
+        print("  - ffmpeg not found.")
         print("    spotdl requires ffmpeg to process audio files.")
         print("    Attempting to download ffmpeg locally for spotdl...")
         try:
-            subprocess.check_call([sys.executable, "-m", "spotdl", "--download-ffmpeg"])
+            p = subprocess.Popen([sys.executable, "-m", "spotdl", "--download-ffmpeg"], stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+            p.communicate(input='n\n')
             print("  - ffmpeg downloaded successfully.")
-        except subprocess.CalledProcessError:
+        except Exception:
             print("  [!] Failed to download ffmpeg automatically.")
             print("      Please install FFmpeg manually from https://ffmpeg.org/download.html")
             print("      and add it to your system PATH.")
             sys.exit(1)
-    else:
-        print("  - ffmpeg is installed.")
 
     # Check for deno (required by yt-dlp to bypass some YouTube restrictions)
     deno_path_win = os.path.expanduser("~/.spotdl/deno.exe")
