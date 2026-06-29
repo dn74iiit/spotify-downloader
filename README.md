@@ -15,7 +15,7 @@ A beautiful, local web application that allows you to easily download Spotify tr
 
 1. **Clone this repository** (or download the files):
    ```bash
-   git clone <your-repo-url>
+   git clone https://github.com/dn74iiit/spotify-downloader
    cd spotify-downloader
    ```
 
